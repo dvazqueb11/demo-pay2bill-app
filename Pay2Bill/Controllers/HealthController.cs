@@ -56,5 +56,12 @@ namespace Pay2Bill.Controllers
 
             return Content(json, "application/json");
         }
+
+        // GET: /health/ui
+        public ActionResult Dashboard()
+        {
+            var result = _healthCheckService.GetHealthStatus();
+            return View(result);
+        }
     }
 }

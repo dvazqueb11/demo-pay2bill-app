@@ -7,46 +7,47 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>📋 Bills</h2>
+    <h2><i class="bi bi-receipt me-2 text-primary"></i>Bills</h2>
 </div>
 
 @if (!unpaid.Any())
 {
-    <div class="alert alert-success">
-        <strong>✅ All bills are paid!</strong> No outstanding balance.
+    <div class="alert alert-success border-0 shadow-sm text-center">
+        <i class="bi bi-check-circle display-6 d-block mb-2 text-success"></i>
+        <strong>All bills are paid!</strong> No outstanding balance.
     </div>
 }
 else
 {
-    <h5 class="text-warning">⏰ Unpaid Bills</h5>
+    <h5 class="text-warning mb-3"><i class="bi bi-clock-history me-2"></i>Unpaid Bills</h5>
     <div class="row g-3 mb-4">
         @foreach (var bill in unpaid)
         {
             <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm h-100 @(bill.DueDate < DateTime.Today ? "border-danger" : "")">
-                    <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card shadow-sm h-100 border-0 bill-card @(bill.DueDate < DateTime.Today ? "overdue-card" : "")">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-transparent">
                         <span class="badge @(bill.Type == Pay2Bill.Models.BillType.Internet ? "bg-info" : "bg-secondary") fs-6">
-                            @bill.TypeDisplayName
+                            <i class="bi bi-@bill.TypeIcon me-1"></i>@bill.TypeDisplayName
                         </span>
                         @if (bill.DueDate < DateTime.Today)
                         {
-                            <span class="badge bg-danger">Overdue</span>
+                            <span class="badge bg-danger"><i class="bi bi-exclamation-circle me-1"></i>Overdue</span>
                         }
                         else if ((bill.DueDate - DateTime.Today).TotalDays <= 3)
                         {
-                            <span class="badge bg-warning text-dark">Due Soon</span>
+                            <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle me-1"></i>Due Soon</span>
                         }
                     </div>
                     <div class="card-body">
-                        <h6 class="card-title">@bill.CustomerName</h6>
+                        <h6 class="card-title"><i class="bi bi-person me-1 text-muted"></i>@bill.CustomerName</h6>
                         <p class="card-text text-muted small">@bill.Description</p>
                         <p class="mb-1"><strong>Account:</strong> <code>@bill.AccountNumber</code></p>
-                        <p class="mb-1"><strong>Due:</strong> @bill.DueDate.ToString("MMM dd, yyyy")</p>
+                        <p class="mb-1"><i class="bi bi-calendar-event me-1 text-muted"></i><strong>Due:</strong> @bill.DueDate.ToString("MMM dd, yyyy")</p>
                         <p class="display-6 fw-bold text-danger mt-2">@bill.AmountDue.ToString("C")</p>
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer bg-transparent border-0 pb-3">
                         <a href="@Url.Action("Pay", "Bill", new { id = bill.Id })"
-                           class="btn btn-primary w-100">Pay Now</a>
+                           class="btn btn-primary w-100"><i class="bi bi-credit-card me-2"></i>Pay Now</a>
                     </div>
                 </div>
             </div>
@@ -56,7 +57,7 @@ else
 
 @if (paid.Any())
 {
-    <h5 class="text-success mt-4">✅ Paid Bills</h5>
+    <h5 class="text-success mt-4"><i class="bi bi-check2-all me-2"></i>Paid Bills</h5>
     <div class="table-responsive">
         <table class="table table-sm table-hover">
             <thead class="table-light">
@@ -75,14 +76,14 @@ else
                     <tr class="text-muted">
                         <td>
                             <span class="badge @(bill.Type == Pay2Bill.Models.BillType.Internet ? "bg-info" : "bg-secondary")">
-                                @bill.TypeDisplayName
+                                <i class="bi bi-@bill.TypeIcon me-1"></i>@bill.TypeDisplayName
                             </span>
                         </td>
                         <td><code>@bill.AccountNumber</code></td>
                         <td>@bill.CustomerName</td>
                         <td>@bill.Description</td>
                         <td>@bill.AmountDue.ToString("C")</td>
-                        <td><span class="badge bg-success">Paid</span></td>
+                        <td><span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Paid</span></td>
                     </tr>
                 }
             </tbody>

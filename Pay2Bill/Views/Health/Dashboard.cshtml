@@ -1,0 +1,128 @@
+@model Pay2Bill.Models.HealthCheckResult
+@{
+    ViewBag.Title = "Health Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var overallIcon = Model.OverallStatus == Pay2Bill.Models.HealthStatus.Healthy ? "check-circle-fill"
+                    : Model.OverallStatus == Pay2Bill.Models.HealthStatus.Degraded ? "exclamation-triangle-fill"
+                    : "x-circle-fill";
+
+    var overallColor = Model.OverallStatus == Pay2Bill.Models.HealthStatus.Healthy ? "success"
+                     : Model.OverallStatus == Pay2Bill.Models.HealthStatus.Degraded ? "warning"
+                     : "danger";
+
+    var overallBg = Model.OverallStatus == Pay2Bill.Models.HealthStatus.Healthy ? "rgba(25,135,84,0.08)"
+                  : Model.OverallStatus == Pay2Bill.Models.HealthStatus.Degraded ? "rgba(255,193,7,0.08)"
+                  : "rgba(220,53,69,0.08)";
+}
+
+<!-- Overall Status Banner -->
+<div class="card border-0 shadow-sm mb-4" style="background: @overallBg;">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-@overallIcon display-1 text-@overallColor d-block mb-3"></i>
+        <h1 class="fw-bold text-@overallColor mb-1">@Model.OverallStatus</h1>
+        <p class="text-muted mb-0">System Health Status</p>
+    </div>
+</div>
+
+<!-- Info Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="icon-circle bg-primary bg-opacity-10 me-3 flex-shrink-0">
+                    <i class="bi bi-tag display-6 text-primary"></i>
+                </div>
+                <div>
+                    <small class="text-muted text-uppercase fw-semibold">Version</small>
+                    <div class="fw-bold">@Model.ApplicationVersion</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="icon-circle bg-info bg-opacity-10 me-3 flex-shrink-0">
+                    <i class="bi bi-cloud display-6 text-info"></i>
+                </div>
+                <div>
+                    <small class="text-muted text-uppercase fw-semibold">Environment</small>
+                    <div class="fw-bold">@Model.Environment</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="icon-circle bg-secondary bg-opacity-10 me-3 flex-shrink-0">
+                    <i class="bi bi-clock display-6 text-secondary"></i>
+                </div>
+                <div>
+                    <small class="text-muted text-uppercase fw-semibold">Checked At</small>
+                    <div class="fw-bold">@Model.Timestamp.ToString("MMM dd, yyyy HH:mm:ss") UTC</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dependencies -->
+<h4 class="mb-3"><i class="bi bi-diagram-3 me-2 text-primary"></i>Dependencies</h4>
+
+<div class="row g-3 mb-4">
+    @foreach (var dep in Model.Dependencies)
+    {
+        var depIcon = dep.Status == Pay2Bill.Models.HealthStatus.Healthy ? "check-circle-fill"
+                    : dep.Status == Pay2Bill.Models.HealthStatus.Degraded ? "exclamation-triangle-fill"
+                    : "x-circle-fill";
+
+        var depColor = dep.Status == Pay2Bill.Models.HealthStatus.Healthy ? "success"
+                     : dep.Status == Pay2Bill.Models.HealthStatus.Degraded ? "warning"
+                     : "danger";
+
+        var serviceIcon = dep.Name == "Redis Cache" ? "hdd-stack"
+                        : dep.Name == "Service Bus" ? "arrow-left-right"
+                        : "app-indicator";
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 health-dep-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-@serviceIcon fs-4 text-muted me-2"></i>
+                            <h6 class="mb-0 fw-bold">@dep.Name</h6>
+                        </div>
+                        <span class="badge bg-@depColor">
+                            <i class="bi bi-@depIcon me-1"></i>@dep.Status
+                        </span>
+                    </div>
+                    <p class="text-muted small mb-2">@dep.Message</p>
+                    <div class="d-flex align-items-center text-muted small">
+                        <i class="bi bi-speedometer2 me-1"></i>
+                        <span>Latency: <strong>@dep.LatencyMs ms</strong></span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
+                    <div class="progress" style="height: 4px;">
+                        @{
+                            var barColor = dep.LatencyMs < 100 ? "bg-success"
+                                         : dep.LatencyMs < 300 ? "bg-warning"
+                                         : "bg-danger";
+                            var barWidth = dep.LatencyMs < 500 ? (dep.LatencyMs * 100 / 500) : 100;
+                        }
+                        <div class="progress-bar @barColor" style="width: @(barWidth)%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- JSON Endpoint Link -->
+<div class="text-center">
+    <a href="/health" target="_blank" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-braces me-1"></i>View Raw JSON
+    </a>
+</div>

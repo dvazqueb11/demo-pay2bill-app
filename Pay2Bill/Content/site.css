@@ -2,7 +2,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #f8f9fa;
+    background-color: #f5f7fa;
 }
 
 .navbar-brand {
@@ -10,8 +10,59 @@ body {
     letter-spacing: -0.5px;
 }
 
+/* Navbar & reusable gradient */
+.navbar-gradient {
+    background: linear-gradient(135deg, #1a3a6b, #0d6efd);
+}
+
+.navbar-gradient .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.navbar-gradient .nav-link:hover,
+.navbar-gradient .nav-link:focus {
+    color: #ffffff !important;
+}
+
+.navbar-gradient .navbar-brand {
+    color: #ffffff !important;
+}
+
+/* Hero section */
+.hero-section {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.05), rgba(102, 16, 242, 0.05));
+    border-radius: 1rem;
+    padding: 2rem;
+}
+
+/* Icon circles */
+.icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cards */
 .card {
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.bill-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.bill-card.overdue-card {
+    border-left: 4px solid #dc3545 !important;
 }
 
 .display-6 {
@@ -32,18 +83,46 @@ body {
     background-color: #dc3545;
 }
 
-/* Bill cards */
-.card.border-danger {
-    border-width: 2px !important;
-}
-
 /* Footer */
 footer {
     border-top: 1px solid #dee2e6;
+}
+
+/* Health dashboard */
+.health-dep-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.health-dep-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Form controls */
 .form-control:focus {
     border-color: #0d6efd;
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+/* Smooth transitions for badges */
+.badge {
+    transition: background-color 0.2s ease;
+}
+
+/* Button hover polish */
+.btn-primary {
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 0.25rem 0.75rem rgba(13, 110, 253, 0.3);
+}
+
+.btn-success:hover {
+    box-shadow: 0 0.25rem 0.75rem rgba(25, 135, 84, 0.3);
 }

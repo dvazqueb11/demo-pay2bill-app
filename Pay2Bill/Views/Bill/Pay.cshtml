@@ -10,28 +10,28 @@
 
         @if (bill != null)
         {
-            <div class="card border-0 bg-light mb-4">
-                <div class="card-body">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body bg-light rounded">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <span class="badge @(bill.Type == Pay2Bill.Models.BillType.Internet ? "bg-info" : "bg-secondary") mb-1">
-                                @bill.TypeDisplayName
+                                <i class="bi bi-@bill.TypeIcon me-1"></i>@bill.TypeDisplayName
                             </span>
                             <h5 class="mb-0">@bill.Description</h5>
-                            <small class="text-muted">Account: @bill.AccountNumber &mdash; @bill.CustomerName</small>
+                            <small class="text-muted"><i class="bi bi-person me-1"></i>@bill.CustomerName &mdash; <code>@bill.AccountNumber</code></small>
                         </div>
                         <div class="text-end">
                             <div class="display-6 fw-bold text-danger">@bill.AmountDue.ToString("C")</div>
-                            <small class="text-muted">Due @bill.DueDate.ToString("MMM dd, yyyy")</small>
+                            <small class="text-muted"><i class="bi bi-calendar-event me-1"></i>Due @bill.DueDate.ToString("MMM dd, yyyy")</small>
                         </div>
                     </div>
                 </div>
             </div>
         }
 
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">💳 Payment Details</h5>
+        <div class="card shadow border-0">
+            <div class="card-header text-white navbar-gradient">
+                <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Payment Details</h5>
             </div>
             <div class="card-body">
                 @using (Html.BeginForm("Pay", "Bill", FormMethod.Post))
@@ -43,41 +43,53 @@
 
                     <div class="mb-3">
                         @Html.LabelFor(m => m.CardholderName, new { @class = "form-label" })
-                        @Html.TextBoxFor(m => m.CardholderName, new { @class = "form-control", placeholder = "John Doe", autocomplete = "cc-name" })
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            @Html.TextBoxFor(m => m.CardholderName, new { @class = "form-control", placeholder = "John Doe", autocomplete = "cc-name" })
+                        </div>
                         @Html.ValidationMessageFor(m => m.CardholderName, "", new { @class = "text-danger small" })
                     </div>
 
                     <div class="mb-3">
                         @Html.LabelFor(m => m.CardNumber, new { @class = "form-label" })
-                        @Html.TextBoxFor(m => m.CardNumber, new { @class = "form-control", placeholder = "4111 1111 1111 1111", maxlength = "19", autocomplete = "cc-number" })
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-credit-card-2-back"></i></span>
+                            @Html.TextBoxFor(m => m.CardNumber, new { @class = "form-control", placeholder = "4111 1111 1111 1111", maxlength = "19", autocomplete = "cc-number" })
+                        </div>
                         @Html.ValidationMessageFor(m => m.CardNumber, "", new { @class = "text-danger small" })
                     </div>
 
                     <div class="row">
                         <div class="col-6 mb-3">
                             @Html.LabelFor(m => m.ExpiryDate, new { @class = "form-label" })
-                            @Html.TextBoxFor(m => m.ExpiryDate, new { @class = "form-control", placeholder = "MM/YY", maxlength = "5", autocomplete = "cc-exp" })
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                                @Html.TextBoxFor(m => m.ExpiryDate, new { @class = "form-control", placeholder = "MM/YY", maxlength = "5", autocomplete = "cc-exp" })
+                            </div>
                             @Html.ValidationMessageFor(m => m.ExpiryDate, "", new { @class = "text-danger small" })
                         </div>
                         <div class="col-6 mb-3">
                             @Html.LabelFor(m => m.Cvv, new { @class = "form-label" })
-                            @Html.TextBoxFor(m => m.Cvv, new { @class = "form-control", placeholder = "123", maxlength = "4", autocomplete = "cc-csc" })
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                @Html.TextBoxFor(m => m.Cvv, new { @class = "form-control", placeholder = "123", maxlength = "4", autocomplete = "cc-csc" })
+                            </div>
                             @Html.ValidationMessageFor(m => m.Cvv, "", new { @class = "text-danger small" })
                         </div>
                     </div>
 
                     <div class="d-grid gap-2 mt-3">
                         <button type="submit" class="btn btn-success btn-lg">
-                            💰 Pay @(bill != null ? bill.AmountDue.ToString("C") : "")
+                            <i class="bi bi-shield-check me-2"></i>Pay @(bill != null ? bill.AmountDue.ToString("C") : "")
                         </button>
-                        <a href="@Url.Action("Index", "Bill")" class="btn btn-outline-secondary">Cancel</a>
+                        <a href="@Url.Action("Index", "Bill")" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Cancel</a>
                     </div>
                 }
             </div>
         </div>
 
         <p class="text-muted small text-center mt-3">
-            🔒 This is a demo application. No real payment is processed.
+            <i class="bi bi-shield-lock me-1"></i>This is a demo application. No real payment is processed.
         </p>
     </div>
 </div>

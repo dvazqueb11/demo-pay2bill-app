@@ -30,9 +30,12 @@ namespace Pay2Bill.Controllers
         }
 
         // GET: /Bill/Pay/{id}
-        public ActionResult Pay(int id)
+        public ActionResult Pay(int? id)
         {
-            var bill = _billService.GetBillById(id);
+            if (!id.HasValue)
+                return RedirectToAction("Index");
+
+            var bill = _billService.GetBillById(id.Value);
             if (bill == null)
                 return HttpNotFound();
 

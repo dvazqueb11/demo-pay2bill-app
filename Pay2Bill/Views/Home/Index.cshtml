@@ -7,36 +7,45 @@
 
 <div class="row">
     <div class="col-12 text-center mb-4">
-        <h1 class="display-5 fw-bold">Welcome to Pay2Bill</h1>
-        <p class="lead text-muted">Azure App Service Demo &mdash; Simplified Bill Payment Application</p>
+        <div class="hero-section py-4">
+            <i class="bi bi-credit-card-2-front display-3 text-primary mb-3 d-block"></i>
+            <h1 class="display-5 fw-bold">Welcome to Pay2Bill</h1>
+            <p class="lead text-muted">Azure App Service Demo &mdash; Simplified Bill Payment Application</p>
+        </div>
     </div>
 </div>
 
 <div class="row g-4 mb-5">
     <!-- Summary Cards -->
     <div class="col-md-4">
-        <div class="card border-primary h-100 shadow-sm">
+        <div class="card border-0 h-100 shadow-sm summary-card">
             <div class="card-body text-center">
-                <div class="display-4 text-primary">📋</div>
-                <h5 class="card-title mt-2">Total Bills</h5>
+                <div class="icon-circle bg-primary bg-opacity-10 mx-auto mb-3">
+                    <i class="bi bi-receipt-cutoff display-5 text-primary"></i>
+                </div>
+                <h5 class="card-title">Total Bills</h5>
                 <p class="card-text display-6 fw-bold">@Model.Count()</p>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card border-warning h-100 shadow-sm">
+        <div class="card border-0 h-100 shadow-sm summary-card">
             <div class="card-body text-center">
-                <div class="display-4 text-warning">⏰</div>
-                <h5 class="card-title mt-2">Unpaid Bills</h5>
+                <div class="icon-circle bg-warning bg-opacity-10 mx-auto mb-3">
+                    <i class="bi bi-clock-history display-5 text-warning"></i>
+                </div>
+                <h5 class="card-title">Unpaid Bills</h5>
                 <p class="card-text display-6 fw-bold text-warning">@unpaidBills.Count</p>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card border-danger h-100 shadow-sm">
+        <div class="card border-0 h-100 shadow-sm summary-card">
             <div class="card-body text-center">
-                <div class="display-4 text-danger">💰</div>
-                <h5 class="card-title mt-2">Amount Due</h5>
+                <div class="icon-circle bg-danger bg-opacity-10 mx-auto mb-3">
+                    <i class="bi bi-currency-dollar display-5 text-danger"></i>
+                </div>
+                <h5 class="card-title">Amount Due</h5>
                 <p class="card-text display-6 fw-bold text-danger">@unpaidBills.Sum(b => b.AmountDue).ToString("C")</p>
             </div>
         </div>
@@ -47,9 +56,9 @@
 {
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-warning text-dark">
-                    <strong>⚠️ Pending Bills</strong>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning bg-opacity-10 border-bottom">
+                    <strong><i class="bi bi-exclamation-triangle text-warning me-2"></i>Pending Bills</strong>
                 </div>
                 <div class="card-body p-0">
                     <table class="table table-hover mb-0">
@@ -70,7 +79,7 @@
                                 <tr class="@(bill.DueDate < DateTime.Today ? "table-danger" : "")">
                                     <td>
                                         <span class="badge @(bill.Type == Pay2Bill.Models.BillType.Internet ? "bg-info" : "bg-secondary")">
-                                            @bill.TypeDisplayName
+                                            <i class="bi bi-@bill.TypeIcon me-1"></i>@bill.TypeDisplayName
                                         </span>
                                     </td>
                                     <td><code>@bill.AccountNumber</code></td>
@@ -81,12 +90,12 @@
                                         @bill.DueDate.ToString("MMM dd, yyyy")
                                         @if (bill.DueDate < DateTime.Today)
                                         {
-                                            <span class="badge bg-danger ms-1">Overdue</span>
+                                            <span class="badge bg-danger ms-1"><i class="bi bi-exclamation-circle me-1"></i>Overdue</span>
                                         }
                                     </td>
                                     <td>
                                         <a href="@Url.Action("Pay", "Bill", new { id = bill.Id })"
-                                           class="btn btn-sm btn-primary">Pay Now</a>
+                                           class="btn btn-sm btn-primary"><i class="bi bi-credit-card me-1"></i>Pay Now</a>
                                     </td>
                                 </tr>
                             }
@@ -99,21 +108,22 @@
 }
 else
 {
-    <div class="alert alert-success text-center mt-3">
-        <h4>✅ All bills are paid!</h4>
+    <div class="alert alert-success text-center mt-3 border-0 shadow-sm">
+        <i class="bi bi-check-circle display-6 d-block mb-2"></i>
+        <h4>All bills are paid!</h4>
         <p class="mb-0">You have no outstanding bills at this time.</p>
     </div>
 }
 
 <div class="row mt-5">
     <div class="col-12">
-        <div class="card border-0 bg-light">
+        <div class="card border-0 bg-light shadow-sm">
             <div class="card-body">
-                <h5 class="card-title">🏗️ Architecture Note</h5>
+                <h5 class="card-title"><i class="bi bi-diagram-3 me-2 text-primary"></i>Architecture Note</h5>
                 <p class="card-text text-muted small">
                     This is a demo application running on <strong>Azure App Service</strong> using
                     <strong>.NET Framework 4.8</strong>. It demonstrates health checks at
-                    <a href="/health" target="_blank">/health</a>,
+                    <a href="/health/ui">/health</a>,
                     Application Insights telemetry, and mock dependency validation.
                     See the <a href="https://github.com/dvazqueb11/demo-pay2bill-app" target="_blank">README</a> for architecture details.
                 </p>
