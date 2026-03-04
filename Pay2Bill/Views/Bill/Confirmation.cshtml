@@ -1,0 +1,48 @@
+@{
+    ViewBag.Title = "Payment Confirmed";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var bill = ViewBag.Bill as Pay2Bill.Models.Bill;
+    var transactionId = ViewBag.TransactionId as string;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card border-success shadow text-center">
+            <div class="card-body py-5">
+                <div class="display-1 text-success mb-3">✅</div>
+                <h2 class="card-title text-success">Payment Confirmed!</h2>
+                <p class="card-text lead text-muted">Your payment has been processed successfully.</p>
+
+                @if (!string.IsNullOrEmpty(transactionId))
+                {
+                    <div class="bg-light rounded p-3 my-4 text-start">
+                        <div class="row g-2">
+                            <div class="col-5 fw-bold text-muted">Transaction ID:</div>
+                            <div class="col-7"><code>@transactionId</code></div>
+
+                            @if (bill != null)
+                            {
+                                <div class="col-5 fw-bold text-muted">Account:</div>
+                                <div class="col-7"><code>@bill.AccountNumber</code></div>
+
+                                <div class="col-5 fw-bold text-muted">Service:</div>
+                                <div class="col-7">@bill.Description</div>
+
+                                <div class="col-5 fw-bold text-muted">Amount Paid:</div>
+                                <div class="col-7 fw-bold text-success">@bill.AmountDue.ToString("C")</div>
+                            }
+
+                            <div class="col-5 fw-bold text-muted">Date:</div>
+                            <div class="col-7">@DateTime.UtcNow.ToString("MMM dd, yyyy HH:mm") UTC</div>
+                        </div>
+                    </div>
+                }
+
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="@Url.Action("Index", "Bill")" class="btn btn-primary">Pay Another Bill</a>
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">Return Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,89 @@
+name: Build and Deploy Pay2Bill to Azure App Service
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  SOLUTION_FILE: Pay2Bill.sln
+  BUILD_CONFIGURATION: Release
+  DOTNET_FRAMEWORK: '4.8'
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+        with:
+          nuget-version: 'latest'
+
+      - name: Restore NuGet Packages
+        run: nuget restore ${{ env.SOLUTION_FILE }}
+
+      - name: Build Solution
+        run: |
+          msbuild ${{ env.SOLUTION_FILE }} `
+            /p:Configuration=${{ env.BUILD_CONFIGURATION }} `
+            /p:DeployOnBuild=true `
+            /p:WebPublishMethod=Package `
+            /p:PackageAsSingleFile=true `
+            /p:SkipInvalidConfigurations=true `
+            /p:PackageLocation="${{ github.workspace }}\artifacts"
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pay2bill-webapp
+          path: ${{ github.workspace }}\artifacts\*.zip
+          retention-days: 5
+
+  deploy:
+    name: Deploy to Azure App Service
+    runs-on: windows-latest
+    needs: build
+    permissions: {}
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.webapp-url }}
+
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pay2bill-webapp
+          path: artifact
+
+      # Option A: Deploy using Publish Profile (recommended for demos)
+      - name: Deploy to Azure Web App
+        id: deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          package: artifact/*.zip
+
+      # Option B: Deploy using Azure CLI with Managed Identity (recommended for production)
+      # - name: Azure Login
+      #   uses: azure/login@v2
+      #   with:
+      #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
+      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      # - name: Deploy via Azure CLI
+      #   run: az webapp deploy --name ${{ secrets.AZURE_WEBAPP_NAME }} --resource-group ${{ secrets.AZURE_RG }} --src-path artifact/*.zip
