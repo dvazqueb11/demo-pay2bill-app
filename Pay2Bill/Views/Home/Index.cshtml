@@ -1,0 +1,123 @@
+@model IEnumerable<Pay2Bill.Models.Bill>
+@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var unpaidBills = Model.Where(b => !b.IsPaid).ToList();
+}
+
+<div class="row">
+    <div class="col-12 text-center mb-4">
+        <h1 class="display-5 fw-bold">Welcome to Pay2Bill</h1>
+        <p class="lead text-muted">Azure App Service Demo &mdash; Simplified Bill Payment Application</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- Summary Cards -->
+    <div class="col-md-4">
+        <div class="card border-primary h-100 shadow-sm">
+            <div class="card-body text-center">
+                <div class="display-4 text-primary">📋</div>
+                <h5 class="card-title mt-2">Total Bills</h5>
+                <p class="card-text display-6 fw-bold">@Model.Count()</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-warning h-100 shadow-sm">
+            <div class="card-body text-center">
+                <div class="display-4 text-warning">⏰</div>
+                <h5 class="card-title mt-2">Unpaid Bills</h5>
+                <p class="card-text display-6 fw-bold text-warning">@unpaidBills.Count</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-danger h-100 shadow-sm">
+            <div class="card-body text-center">
+                <div class="display-4 text-danger">💰</div>
+                <h5 class="card-title mt-2">Amount Due</h5>
+                <p class="card-text display-6 fw-bold text-danger">@unpaidBills.Sum(b => b.AmountDue).ToString("C")</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (unpaidBills.Any())
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <strong>⚠️ Pending Bills</strong>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Type</th>
+                                <th>Account</th>
+                                <th>Customer</th>
+                                <th>Description</th>
+                                <th>Amount Due</th>
+                                <th>Due Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var bill in unpaidBills)
+                            {
+                                <tr class="@(bill.DueDate < DateTime.Today ? "table-danger" : "")">
+                                    <td>
+                                        <span class="badge @(bill.Type == Pay2Bill.Models.BillType.Internet ? "bg-info" : "bg-secondary")">
+                                            @bill.TypeDisplayName
+                                        </span>
+                                    </td>
+                                    <td><code>@bill.AccountNumber</code></td>
+                                    <td>@bill.CustomerName</td>
+                                    <td>@bill.Description</td>
+                                    <td class="fw-bold">@bill.AmountDue.ToString("C")</td>
+                                    <td class="@(bill.DueDate < DateTime.Today ? "text-danger fw-bold" : "")">
+                                        @bill.DueDate.ToString("MMM dd, yyyy")
+                                        @if (bill.DueDate < DateTime.Today)
+                                        {
+                                            <span class="badge bg-danger ms-1">Overdue</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a href="@Url.Action("Pay", "Bill", new { id = bill.Id })"
+                                           class="btn btn-sm btn-primary">Pay Now</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-success text-center mt-3">
+        <h4>✅ All bills are paid!</h4>
+        <p class="mb-0">You have no outstanding bills at this time.</p>
+    </div>
+}
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card border-0 bg-light">
+            <div class="card-body">
+                <h5 class="card-title">🏗️ Architecture Note</h5>
+                <p class="card-text text-muted small">
+                    This is a demo application running on <strong>Azure App Service</strong> using
+                    <strong>.NET Framework 4.8</strong>. It demonstrates health checks at
+                    <a href="/health" target="_blank">/health</a>,
+                    Application Insights telemetry, and mock dependency validation.
+                    See the <a href="https://github.com/dvazqueb11/demo-pay2bill-app" target="_blank">README</a> for architecture details.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

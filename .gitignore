@@ -1,0 +1,33 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio artifacts
+*.user
+*.suo
+*.cache
+*.pdb
+*.opendb
+.vs/
+*.vssscc
+*.vspscc
+
+# NuGet
+packages/
+*.nupkg
+project.lock.json
+
+# ASP.NET
+App_Data/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Rider
+.idea/

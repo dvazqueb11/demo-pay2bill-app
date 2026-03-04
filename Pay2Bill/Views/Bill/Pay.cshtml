@@ -1,0 +1,83 @@
+@model Pay2Bill.Models.PaymentRequest
+@{
+    ViewBag.Title = "Pay Bill";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var bill = ViewBag.Bill as Pay2Bill.Models.Bill;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+        @if (bill != null)
+        {
+            <div class="card border-0 bg-light mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge @(bill.Type == Pay2Bill.Models.BillType.Internet ? "bg-info" : "bg-secondary") mb-1">
+                                @bill.TypeDisplayName
+                            </span>
+                            <h5 class="mb-0">@bill.Description</h5>
+                            <small class="text-muted">Account: @bill.AccountNumber &mdash; @bill.CustomerName</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="display-6 fw-bold text-danger">@bill.AmountDue.ToString("C")</div>
+                            <small class="text-muted">Due @bill.DueDate.ToString("MMM dd, yyyy")</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">💳 Payment Details</h5>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("Pay", "Bill", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.BillId)
+
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.CardholderName, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.CardholderName, new { @class = "form-control", placeholder = "John Doe", autocomplete = "cc-name" })
+                        @Html.ValidationMessageFor(m => m.CardholderName, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.CardNumber, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.CardNumber, new { @class = "form-control", placeholder = "4111 1111 1111 1111", maxlength = "19", autocomplete = "cc-number" })
+                        @Html.ValidationMessageFor(m => m.CardNumber, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            @Html.LabelFor(m => m.ExpiryDate, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.ExpiryDate, new { @class = "form-control", placeholder = "MM/YY", maxlength = "5", autocomplete = "cc-exp" })
+                            @Html.ValidationMessageFor(m => m.ExpiryDate, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-6 mb-3">
+                            @Html.LabelFor(m => m.Cvv, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Cvv, new { @class = "form-control", placeholder = "123", maxlength = "4", autocomplete = "cc-csc" })
+                            @Html.ValidationMessageFor(m => m.Cvv, "", new { @class = "text-danger small" })
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            💰 Pay @(bill != null ? bill.AmountDue.ToString("C") : "")
+                        </button>
+                        <a href="@Url.Action("Index", "Bill")" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <p class="text-muted small text-center mt-3">
+            🔒 This is a demo application. No real payment is processed.
+        </p>
+    </div>
+</div>
