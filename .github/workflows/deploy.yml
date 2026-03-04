@@ -2,9 +2,9 @@ name: Build and Deploy Pay2Bill to Azure App Service
 
 on:
   push:
-    branches: [development-v1]
+    branches: [main]
   pull_request:
-    branches: [development-v1]
+    branches: [main]
   workflow_dispatch:
 
 env:
@@ -56,10 +56,10 @@ jobs:
     runs-on: windows-latest
     needs: build
     permissions: {}
-    if: github.ref == 'refs/heads/development-v1' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
 
     environment:
-      name: dev
+      name: production
       url: ${{ steps.deploy.outputs.webapp-url }}
 
     steps:
@@ -74,8 +74,7 @@ jobs:
         id: deploy
         uses: azure/webapps-deploy@v3
         with:
-          app-name: pay2bill-app
-          slot-name: dev
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: artifact/*.zip
 
