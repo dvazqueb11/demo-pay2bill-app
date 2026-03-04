@@ -13,6 +13,12 @@ namespace Pay2Bill.App_Start
             // This is monitored by Azure App Service Health Check feature
             // Configuration: App Service > Monitoring > Health check > Path = /health
             routes.MapRoute(
+                name: "HealthDashboard",
+                url: "health/ui",
+                defaults: new { controller = "Health", action = "Dashboard" }
+            );
+
+            routes.MapRoute(
                 name: "Health",
                 url: "health",
                 defaults: new { controller = "Health", action = "Index" }
