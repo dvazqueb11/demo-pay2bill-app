@@ -3,14 +3,12 @@ name: Build and Deploy Pay2Bill to Azure App Service
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 env:
   SOLUTION_FILE: Pay2Bill.sln
   BUILD_CONFIGURATION: Release
-  DOTNET_FRAMEWORK: '4.8'
+  AZURE_WEBAPP_NAME: pay2bill-app
 
 jobs:
   build:
@@ -51,15 +49,16 @@ jobs:
           path: ${{ github.workspace }}\artifacts\*.zip
           retention-days: 5
 
-  deploy:
-    name: Deploy to Azure App Service
+  deploy-dev:
+    name: Deploy to Dev Slot
     runs-on: windows-latest
     needs: build
-    permissions: {}
+    permissions:
+      id-token: write
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
 
     environment:
-      name: production
+      name: dev
       url: ${{ steps.deploy.outputs.webapp-url }}
 
     steps:
@@ -69,21 +68,17 @@ jobs:
           name: pay2bill-webapp
           path: artifact
 
-      # Option A: Deploy using Publish Profile (recommended for demos)
-      - name: Deploy to Azure Web App
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Dev Slot
         id: deploy
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: dev
           package: artifact/*.zip
-
-      # Option B: Deploy using Azure CLI with Managed Identity (recommended for production)
-      # - name: Azure Login
-      #   uses: azure/login@v2
-      #   with:
-      #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
-      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      # - name: Deploy via Azure CLI
-      #   run: az webapp deploy --name ${{ secrets.AZURE_WEBAPP_NAME }} --resource-group ${{ secrets.AZURE_RG }} --src-path artifact/*.zip
