@@ -1,7 +1,7 @@
 # Pay2Bill — Azure App Service Demo Application
 
 A reference implementation of a simplified bill-payment web application built on **ASP.NET MVC (.NET Framework 4.8)**, designed to demonstrate best practices for hosting on **Azure App Service**.  
-This is a **DEMO / EDE session reference** — no real payments are processed and no real Azure services are required to run it.
+This is a **DEMO** — no real payments are processed and no real Azure services are required to run it.
 
 ---
 
@@ -355,33 +355,6 @@ jobs:
 | `AZURE_PUBLISH_PROFILE` | Publish profile XML from Azure Portal |
 
 ---
-
-## EDE / Health Check Discussion Points
-
-This application is designed for **Enterprise Design Engagements** and health check conversations with customers. Key talking points:
-
-### 1. What is the `/health` endpoint?
-> A single, unified endpoint that aggregates the health of all critical dependencies. Azure App Service polls this endpoint to determine if an instance is healthy enough to serve traffic.
-
-### 2. Why return 503 for unhealthy?
-> Azure App Service (and load balancers) interpret any non-2xx response as unhealthy, removing the instance from rotation. Returning 503 explicitly ensures correct behavior with all proxy layers.
-
-### 3. How do you simulate failure without deploying?
-> Toggle `HealthCheck:Redis:IsHealthy = false` in Azure App Service **Application Settings** — no code change or redeployment needed. This demonstrates the power of externalized configuration.
-
-### 4. How does this map to real health check best practices?
-> - Check all **external** dependencies (Redis, Service Bus, SQL)
-> - Keep the check **fast** (< 2 seconds total)
-> - Do **not** check internal app logic (only infrastructure)
-> - Return **structured JSON** for monitoring systems to parse
-> - Alert on sustained unhealthy status (Azure Monitor alerts)
-
-### 5. What about Application Insights?
-> Every payment generates a `PaymentAttempt` + `PaymentSuccess` or `PaymentFailure` custom event, enabling:
-> - **Failure rate dashboards** — Kusto query on custom events
-> - **SLA reporting** — payments processed per hour
-> - **Distributed tracing** — follow a payment via Correlation ID across all services
-
 ---
 
 *Built as a demo reference for Azure App Service health check and monitoring workshops.*
