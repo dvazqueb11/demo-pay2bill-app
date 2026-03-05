@@ -38,22 +38,19 @@ jobs:
             /p:Configuration=${{ env.BUILD_CONFIGURATION }} `
             /p:DeployOnBuild=true `
             /p:WebPublishMethod=FileSystem `
-            /p:publishUrl="${{ github.workspace }}\publish" `
+            /p:publishUrl=publish `
             /p:SkipInvalidConfigurations=true
-
-      - name: Verify Publish Output
-        run: Get-ChildItem "${{ github.workspace }}\publish" -Recurse | Select-Object -First 20
 
       - name: Create Zip Package
         run: |
-          New-Item -ItemType Directory -Path "${{ github.workspace }}\artifacts" -Force
-          Compress-Archive -Path "${{ github.workspace }}\publish\*" -DestinationPath "${{ github.workspace }}\artifacts\pay2bill.zip"
+          New-Item -ItemType Directory -Path artifacts -Force
+          Compress-Archive -Path "Pay2Bill\publish\*" -DestinationPath "artifacts\pay2bill.zip"
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: pay2bill-webapp
-          path: ${{ github.workspace }}\artifacts\pay2bill.zip
+          path: artifacts\pay2bill.zip
           retention-days: 5
 
   deploy-dev:
