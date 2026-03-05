@@ -11,11 +11,14 @@ env:
   AZURE_WEBAPP_NAME: pay2bill-app
 
 jobs:
-  build:
-    name: Build
+  build-and-deploy:
+    name: Build and Deploy to Dev Slot
     runs-on: windows-latest
     permissions:
       contents: read
+
+    environment:
+      name: dev
 
     steps:
       - name: Checkout
@@ -42,29 +45,21 @@ jobs:
             /p:SkipInvalidConfigurations=true `
             /p:PackageLocation="${{ github.workspace }}\artifacts"
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: pay2bill-webapp
-          path: ${{ github.workspace }}\artifacts\Pay2Bill.zip
-          retention-days: 5
+      - name: Extract Web Deploy Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path deploy -Force
+          Expand-Archive -Path "${{ github.workspace }}\artifacts\Pay2Bill.zip" -DestinationPath extracted
+          $contentPath = Get-ChildItem -Path extracted -Recurse -Directory -Filter "PackageTmp" | Select-Object -First 1
+          Copy-Item -Path "$($contentPath.FullName)\*" -Destination deploy -Recurse
+          Write-Host "Files ready for deployment:"
+          Get-ChildItem deploy | Format-Table Name
 
-  deploy-dev:
-    name: Deploy to Dev Slot
-    runs-on: windows-latest
-    needs: build
-    permissions: {}
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-
-    environment:
-      name: dev
-
-    steps:
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: pay2bill-webapp
-          path: artifact
+      - name: Create Clean Zip
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "deploy\*" -DestinationPath "pay2bill-deploy.zip"
+          Write-Host "Deploy zip size: $([math]::Round((Get-Item pay2bill-deploy.zip).Length / 1MB, 2)) MB"
 
       - name: Deploy to Dev Slot
         uses: azure/webapps-deploy@v3
@@ -72,4 +67,4 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: dev
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_DEV }}
-          package: artifact/Pay2Bill.zip
+          package: pay2bill-deploy.zip
