@@ -32,14 +32,17 @@ jobs:
       - name: Restore NuGet Packages
         run: nuget restore ${{ env.SOLUTION_FILE }}
 
-      - name: Build Solution
+      - name: Build and Publish
         run: |
-          msbuild ${{ env.SOLUTION_FILE }} `
+          msbuild Pay2Bill\Pay2Bill.csproj `
             /p:Configuration=${{ env.BUILD_CONFIGURATION }} `
             /p:DeployOnBuild=true `
             /p:WebPublishMethod=FileSystem `
             /p:publishUrl="${{ github.workspace }}\publish" `
             /p:SkipInvalidConfigurations=true
+
+      - name: Verify Publish Output
+        run: Get-ChildItem "${{ github.workspace }}\publish" -Recurse | Select-Object -First 20
 
       - name: Create Zip Package
         run: |
