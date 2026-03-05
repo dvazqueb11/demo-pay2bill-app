@@ -40,13 +40,13 @@ jobs:
             /p:WebPublishMethod=Package `
             /p:PackageAsSingleFile=true `
             /p:SkipInvalidConfigurations=true `
-            /p:PackageLocation="artifacts"
+            /p:PackageLocation="${{ github.workspace }}\artifacts"
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: pay2bill-webapp
-          path: artifacts\*.zip
+          path: ${{ github.workspace }}\artifacts\Pay2Bill.zip
           retention-days: 5
 
   deploy-dev:
