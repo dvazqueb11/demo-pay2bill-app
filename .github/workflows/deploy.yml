@@ -37,16 +37,18 @@ jobs:
           msbuild ${{ env.SOLUTION_FILE }} `
             /p:Configuration=${{ env.BUILD_CONFIGURATION }} `
             /p:DeployOnBuild=true `
-            /p:WebPublishMethod=Package `
-            /p:PackageAsSingleFile=true `
-            /p:SkipInvalidConfigurations=true `
-            /p:PackageLocation="${{ github.workspace }}\artifacts"
+            /p:WebPublishMethod=FileSystem `
+            /p:publishUrl="${{ github.workspace }}\publish" `
+            /p:SkipInvalidConfigurations=true
+
+      - name: Create Zip Package
+        run: Compress-Archive -Path "${{ github.workspace }}\publish\*" -DestinationPath "${{ github.workspace }}\artifacts\pay2bill.zip"
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: pay2bill-webapp
-          path: ${{ github.workspace }}\artifacts\*.zip
+          path: ${{ github.workspace }}\artifacts\pay2bill.zip
           retention-days: 5
 
   deploy-dev:
@@ -81,4 +83,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: dev
-          package: artifact/*.zip
+          package: artifact/pay2bill.zip
