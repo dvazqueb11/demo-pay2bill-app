@@ -42,7 +42,9 @@ jobs:
             /p:SkipInvalidConfigurations=true
 
       - name: Create Zip Package
-        run: Compress-Archive -Path "${{ github.workspace }}\publish\*" -DestinationPath "${{ github.workspace }}\artifacts\pay2bill.zip"
+        run: |
+          New-Item -ItemType Directory -Path "${{ github.workspace }}\artifacts" -Force
+          Compress-Archive -Path "${{ github.workspace }}\publish\*" -DestinationPath "${{ github.workspace }}\artifacts\pay2bill.zip"
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
